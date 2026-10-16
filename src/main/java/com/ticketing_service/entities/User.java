@@ -34,7 +34,7 @@ public class User extends BaseEntity {
     @Column(name = "is_enabled")
     private Boolean isEnabled = true;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id")
     private Role role;
 
