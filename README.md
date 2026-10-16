@@ -22,3 +22,6 @@ Tutorials and docs used for each subject while building this project.
 | validation | https://medium.com/paysafe-bulgaria/springboot-dto-validation-good-practices-and-breakdown-fee69277b3b0 |
 | validation groups | https://saurav-sanyal.medium.com/using-groups-for-conditional-validation-in-spring-boot-b561c0f377db |
 | mapstruct | https://www.baeldung.com/spring-mapstruct-mapper-bean-creation |
+| Spring Securit with JWT | https://www.geeksforgeeks.org/springboot/spring-boot-3-0-jwt-authentication-with-spring-security-using-mysql-database/ |
+| Spring Securit with JWT | https://github.com/bezkoder/spring-boot-spring-security-jwt-authentication/tree/master |
+| postgresql enum | https://www.postgresql.org/docs/current/datatype-enum.html |
