@@ -1,6 +1,7 @@
 package com.ticketing_service.dto;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ticketing_service.enums.TicketStatusEnum;
 import com.ticketing_service.validations.groups.CreateTicket;
@@ -33,8 +34,10 @@ public class TicketDto {
     private TicketStatusEnum Status;
 
     private String modifyBy;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Riyadh")
     private Instant modifyAt;
     private String createdBy;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Riyadh")
     private Instant createAt;
 
     @JsonIgnore()
