@@ -1,6 +1,7 @@
 package com.ticketing_service.dto;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ticketing_service.enums.TicketStatusEnum;
 import com.ticketing_service.validations.groups.CreateTicket;
 import jakarta.validation.constraints.*;
@@ -35,6 +36,7 @@ public class TicketDto {
     private String createdBy;
     private Instant createAt;
 
+    @JsonIgnore()
     private Boolean isDeleted;
 
 
