@@ -48,4 +48,29 @@ public class TicketServiceImpl implements TicketService {
 
         return ticketMapper.toDtoList(ticketRepo.findAllByIsDeletedFalse());
     }
+
+    @Override
+    public TicketDto updateText(Long id, TicketDto ticketDto) {
+
+        Ticket ticket = ticketRepo.findByIdAndIsDeletedFalse(id)
+                .orElseThrow(() -> new ApiRequestException("ticket not found"));
+        ticket.setText(ticketDto.getText());
+
+        return ticketMapper.toDto(ticketRepo.save(ticket));
+    }
+
+    @Override
+    public TicketDto resolveTicket(Long id) {
+
+        Ticket ticket = ticketRepo.findByIdAndIsDeletedFalse(id)
+                .orElseThrow(() -> new ApiRequestException("ticket not found"));
+
+
+        if (ticket.getStatus() != TicketStatusEnum.NEW) {
+            throw new ApiRequestException("only NEW tickets can be resolved");
+        }
+        ticket.setStatus(TicketStatusEnum.RESOLVED);
+
+        return ticketMapper.toDto(ticketRepo.save(ticket));
+    }
 }

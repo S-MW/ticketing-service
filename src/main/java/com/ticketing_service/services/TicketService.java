@@ -13,4 +13,8 @@ public interface TicketService {
 
     List<TicketDto> getAll();
 
+    TicketDto updateText(Long id, TicketDto ticketDto);
+
+    TicketDto resolveTicket(Long id);
+
 }
