@@ -6,6 +6,7 @@ import com.ticketing_service.enums.TicketStatusEnum;
 import com.ticketing_service.exceptions.ApiRequestException;
 import com.ticketing_service.mappers.TicketMapper;
 import com.ticketing_service.repositories.TicketRepo;
+import com.ticketing_service.services.LogService;
 import com.ticketing_service.services.TicketService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -18,10 +19,12 @@ public class TicketServiceImpl implements TicketService {
 
     private final TicketRepo ticketRepo;
     private final TicketMapper ticketMapper;
+    private final LogService logService;
 
-    public TicketServiceImpl(TicketRepo ticketRepo,TicketMapper ticketMapper) {
+    public TicketServiceImpl(TicketRepo ticketRepo, TicketMapper ticketMapper, LogService logService) {
         this.ticketRepo = ticketRepo;
         this.ticketMapper = ticketMapper;
+        this.logService = logService;
     }
 
     @Override
@@ -31,7 +34,10 @@ public class TicketServiceImpl implements TicketService {
         ticket.setStatus(TicketStatusEnum.NEW);
         ticket.setIsDeleted(Boolean.FALSE);
 
-        return ticketMapper.toDto(ticketRepo.save(ticket));
+        Ticket savedTicket = ticketRepo.save(ticket);
+        logService.logTicketStatus(savedTicket.getId(), null, TicketStatusEnum.NEW, savedTicket.getCreatedBy());
+
+        return ticketMapper.toDto(savedTicket);
     }
 
     @Override
@@ -71,6 +77,9 @@ public class TicketServiceImpl implements TicketService {
         }
         ticket.setStatus(TicketStatusEnum.RESOLVED);
 
-        return ticketMapper.toDto(ticketRepo.save(ticket));
+        Ticket savedTicket = ticketRepo.save(ticket);
+        logService.logTicketStatus(savedTicket.getId(), TicketStatusEnum.NEW, TicketStatusEnum.RESOLVED, savedTicket.getModifyBy());
+
+        return ticketMapper.toDto(savedTicket);
     }
 }

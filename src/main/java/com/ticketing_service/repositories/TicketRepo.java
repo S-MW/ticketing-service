@@ -20,16 +20,24 @@ public interface TicketRepo extends JpaRepository<Ticket, Long> {
 
     List<Ticket> findAllByIsDeletedFalse();
 
+    @Query("""
+            SELECT t.id FROM Ticket t
+            WHERE t.Status = :status AND t.isDeleted = false AND t.createAt <= :datetimeBefore30s
+            """)
+    List<Long> findNewTicketIdsToExpire(@Param("status") TicketStatusEnum status,
+                                        @Param("datetimeBefore30s") Instant datetimeBefore30s);
+
+    // keep "t.Status = :fromStatus" so a ticket resolved in the meantime is not overwritten
     @Modifying
     @Transactional
     @Query("""
             UPDATE Ticket t
             SET t.Status = :toStatus, t.modifyAt = :now, t.modifyBy = 'SYSTEM:JOB'
-            WHERE t.Status = :fromStatus AND t.isDeleted = false AND t.createAt <= :datetimeBefore30s
+            WHERE t.id IN :ids AND t.Status = :fromStatus
             """)
-    int updateNewTicketsToExpired(@Param("fromStatus") TicketStatusEnum fromStatus,
+    int updateNewTicketsToExpired(@Param("ids") List<Long> ids,
+                                  @Param("fromStatus") TicketStatusEnum fromStatus,
                                   @Param("toStatus") TicketStatusEnum toStatus,
-                                  @Param("datetimeBefore30s") Instant datetimeBefore30s,
                                   @Param("now") Instant now);
 
     @Modifying

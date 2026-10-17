@@ -25,3 +25,4 @@ Tutorials and docs used for each subject while building this project.
 | Spring Securit with JWT | https://www.geeksforgeeks.org/springboot/spring-boot-3-0-jwt-authentication-with-spring-security-using-mysql-database/ |
 | Spring Securit with JWT | https://github.com/bezkoder/spring-boot-spring-security-jwt-authentication/tree/master |
 | postgresql enum | https://www.postgresql.org/docs/current/datatype-enum.html |
+| scheduled  | https://www.baeldung.com/spring-scheduled-tasks |

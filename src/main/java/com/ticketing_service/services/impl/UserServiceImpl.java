@@ -10,6 +10,7 @@ import com.ticketing_service.mappers.UserMapper;
 import com.ticketing_service.repositories.RoleRepo;
 import com.ticketing_service.repositories.UserRepo;
 import com.ticketing_service.security.JwtService;
+import com.ticketing_service.services.LogService;
 import com.ticketing_service.services.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -29,15 +30,17 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final LogService logService;
 
 
-    public UserServiceImpl(UserRepo userRepo, RoleRepo roleRepo, UserMapper userMapper, PasswordEncoder passwordEncoder, JwtService jwtService, AuthenticationManager authenticationManager) {
+    public UserServiceImpl(UserRepo userRepo, RoleRepo roleRepo, UserMapper userMapper, PasswordEncoder passwordEncoder, JwtService jwtService, AuthenticationManager authenticationManager, LogService logService) {
         this.userRepo = userRepo;
         this.roleRepo = roleRepo;
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
+        this.logService = logService;
     }
 
     @Override
@@ -67,8 +70,10 @@ public class UserServiceImpl implements UserService {
             authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userDto.getEmail(), userDto.getPassword()));
         } catch (AuthenticationException e) {
             log.error(e.getMessage());
+            logService.logLogin(userDto.getEmail(), false);
             throw new ApiRequestException("invalid email or password");
         }
+        logService.logLogin(authentication.getName(), true);
         String role = authentication.getAuthorities().iterator().next().getAuthority();
         return new UserLoginResponseDto(jwtService.generateToken(authentication.getName(), role));
     }
