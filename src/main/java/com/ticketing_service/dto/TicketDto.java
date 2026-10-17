@@ -3,9 +3,11 @@ package com.ticketing_service.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ticketing_service.enums.TicketStatusEnum;
 import com.ticketing_service.validations.groups.CreateTicket;
 import com.ticketing_service.validations.groups.UpdateTicket;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,6 +21,7 @@ import java.time.Instant;
 @AllArgsConstructor
 public class TicketDto {
 
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     private Long id;
 
     @NotNull(groups = {CreateTicket.class, UpdateTicket.class})
@@ -29,14 +32,21 @@ public class TicketDto {
             message = "text can not contain symbols or numbers",
             groups = {CreateTicket.class, UpdateTicket.class}
     )
+    @Schema(description = "ticket text, letters and spaces only ( max 250 )", example = "my printer is not working")
     private String text;
 
-    private TicketStatusEnum Status;
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+    @JsonProperty(value = "Status", access = JsonProperty.Access.READ_ONLY)
+    private TicketStatusEnum status;
 
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     private String modifyBy;
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Riyadh")
     private Instant modifyAt;
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     private String createdBy;
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Riyadh")
     private Instant createAt;
 

@@ -1,5 +1,6 @@
 package com.ticketing_service.services.impl;
 
+import com.ticketing_service.dto.LoginRequestDto;
 import com.ticketing_service.dto.UserDto;
 import com.ticketing_service.dto.UserLoginResponseDto;
 import com.ticketing_service.dto.UserResponseDto;
@@ -64,13 +65,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserLoginResponseDto login(UserDto userDto) {
+    public UserLoginResponseDto login(LoginRequestDto loginRequestDto) {
         Authentication authentication;
         try {
-            authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userDto.getEmail(), userDto.getPassword()));
+            authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequestDto.getEmail(), loginRequestDto.getPassword()));
         } catch (AuthenticationException e) {
             log.error(e.getMessage());
-            logService.logLogin(userDto.getEmail(), false);
+            logService.logLogin(loginRequestDto.getEmail(), false);
             throw new ApiRequestException("invalid email or password");
         }
         logService.logLogin(authentication.getName(), true);
