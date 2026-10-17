@@ -1,0 +1,186 @@
+{
+  "info": {
+    "name": "Ticketing Service",
+    "description": "Run the requests from top to bottom ( or use Run collection ).\n\n1. Register the 3 demo users ( an \"email is already exist\" error is fine on later runs ).\n2. Login saves each user's token into the collection variables automatically.\n3. Create Ticket saves the new ticket id into {{ticketId}}.\n\nRoles: Customer creates tickets, Agent views / updates / resolves them, Monitor reads the logs.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080/api/v1" },
+    { "key": "password", "value": "Password_123" },
+    { "key": "customerEmail", "value": "customer@example.com" },
+    { "key": "agentEmail", "value": "agent@example.com" },
+    { "key": "monitorEmail", "value": "monitor@example.com" },
+    { "key": "customerToken", "value": "" },
+    { "key": "agentToken", "value": "" },
+    { "key": "monitorToken", "value": "" },
+    { "key": "ticketId", "value": "1" }
+  ],
+  "item": [
+    {
+      "name": "1. Users",
+      "item": [
+        {
+          "name": "Register Customer",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Customer\",\n  \"email\": \"{{customerEmail}}\",\n  \"password\": \"{{password}}\",\n  \"role_name\": \"Customer\"\n}" },
+            "url": "{{baseUrl}}/users/register"
+          }
+        },
+        {
+          "name": "Register Agent",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Agent\",\n  \"email\": \"{{agentEmail}}\",\n  \"password\": \"{{password}}\",\n  \"role_name\": \"Agent\"\n}" },
+            "url": "{{baseUrl}}/users/register"
+          }
+        },
+        {
+          "name": "Register Monitor",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Monitor\",\n  \"email\": \"{{monitorEmail}}\",\n  \"password\": \"{{password}}\",\n  \"role_name\": \"Monitor\"\n}" },
+            "url": "{{baseUrl}}/users/register"
+          }
+        },
+        {
+          "name": "Login Customer",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "if (pm.response.code === 200) {",
+            "    pm.collectionVariables.set('customerToken', pm.response.json().token);",
+            "}"
+          ] } }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"{{customerEmail}}\",\n  \"password\": \"{{password}}\"\n}" },
+            "url": "{{baseUrl}}/users/login"
+          }
+        },
+        {
+          "name": "Login Agent",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "if (pm.response.code === 200) {",
+            "    pm.collectionVariables.set('agentToken', pm.response.json().token);",
+            "}"
+          ] } }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"{{agentEmail}}\",\n  \"password\": \"{{password}}\"\n}" },
+            "url": "{{baseUrl}}/users/login"
+          }
+        },
+        {
+          "name": "Login Monitor",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "if (pm.response.code === 200) {",
+            "    pm.collectionVariables.set('monitorToken', pm.response.json().token);",
+            "}"
+          ] } }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"{{monitorEmail}}\",\n  \"password\": \"{{password}}\"\n}" },
+            "url": "{{baseUrl}}/users/login"
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Tickets",
+      "item": [
+        {
+          "name": "Create Ticket (Customer)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "if (pm.response.code === 201) {",
+            "    pm.collectionVariables.set('ticketId', pm.response.json().data.id);",
+            "}"
+          ] } }],
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{customerToken}}", "type": "string" }] },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"text\": \"my printer is not working\"\n}" },
+            "url": "{{baseUrl}}/tickets"
+          }
+        },
+        {
+          "name": "Get All Tickets (Agent)",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{agentToken}}", "type": "string" }] },
+            "method": "GET",
+            "url": "{{baseUrl}}/tickets"
+          }
+        },
+        {
+          "name": "Get Ticket By Id (Agent)",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{agentToken}}", "type": "string" }] },
+            "method": "GET",
+            "url": "{{baseUrl}}/tickets/{{ticketId}}"
+          }
+        },
+        {
+          "name": "Update Ticket Text (Agent)",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{agentToken}}", "type": "string" }] },
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"text\": \"my printer is not working after the update\"\n}" },
+            "url": "{{baseUrl}}/tickets/{{ticketId}}"
+          }
+        },
+        {
+          "name": "Resolve Ticket (Agent)",
+          "request": {
+            "description": "Only NEW tickets can be resolved. A ticket expires after 30 seconds, so resolve it quickly after creating it.",
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{agentToken}}", "type": "string" }] },
+            "method": "PATCH",
+            "url": "{{baseUrl}}/tickets/{{ticketId}}/resolve"
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Logs (Monitor)",
+      "item": [
+        {
+          "name": "Ticket Status Logs",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{monitorToken}}", "type": "string" }] },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/logs/ticket-status?page=0&size=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["logs", "ticket-status"],
+              "query": [
+                { "key": "page", "value": "0", "description": "page number, starts from 0" },
+                { "key": "size", "value": "20", "description": "rows per page" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Login History Logs",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{monitorToken}}", "type": "string" }] },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/logs/logins?page=0&size=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["logs", "logins"],
+              "query": [
+                { "key": "page", "value": "0", "description": "page number, starts from 0" },
+                { "key": "size", "value": "20", "description": "rows per page" }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

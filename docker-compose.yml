@@ -1,0 +1,82 @@
+# Ticketing service + PostgreSQL + pgAdmin
+#   everything ( no Java needed ):   docker compose up -d --build
+#   database only ( run app with Java ):   docker compose up -d postgres pgadmin
+#   stop:   docker compose down        ( data is kept in the volumes )
+#
+#   App        : http://localhost:8080/swagger-ui.html
+#   PostgreSQL : localhost:5432   db / user / password = ticketing
+#   pgAdmin    : http://localhost:5050   login admin@example.com / admin
+
+services:
+
+  app:
+    build: .
+    container_name: ticketing-app
+    environment:
+      # inside docker the database host is the "postgres" service, not localhost
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/ticketing
+      SPRING_DATASOURCE_USERNAME: ticketing
+      SPRING_DATASOURCE_PASSWORD: ticketing
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:17-alpine
+    container_name: ticketing-postgres
+    environment:
+      POSTGRES_DB: ticketing
+      POSTGRES_USER: ticketing
+      POSTGRES_PASSWORD: ticketing
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ticketing -d ticketing"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  pgadmin:
+    image: dpage/pgadmin4:9.8
+    container_name: ticketing-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    # registers the "ticketing" server in pgAdmin automatically ( password: ticketing )
+    configs:
+      - source: pgadmin-servers
+        target: /pgadmin4/servers.json
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  pgdata:
+    name: ticketing-pgdata
+  pgadmin-data:
+    name: ticketing-pgadmin-data
+
+configs:
+  pgadmin-servers:
+    content: |
+      {
+        "Servers": {
+          "1": {
+            "Name": "ticketing",
+            "Group": "Servers",
+            "Host": "postgres",
+            "Port": 5432,
+            "MaintenanceDB": "ticketing",
+            "Username": "ticketing",
+            "SSLMode": "prefer"
+          }
+        }
+      }
