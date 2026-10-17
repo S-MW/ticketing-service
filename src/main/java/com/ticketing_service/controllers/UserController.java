@@ -1,11 +1,11 @@
 package com.ticketing_service.controllers;
 
 
+import com.ticketing_service.dto.LoginRequestDto;
 import com.ticketing_service.dto.UserDto;
 import com.ticketing_service.dto.UserLoginResponseDto;
 import com.ticketing_service.dto.UserResponseDto;
 import com.ticketing_service.services.UserService;
-import com.ticketing_service.validations.groups.UserLogin;
 import com.ticketing_service.validations.groups.UserSignUp;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -28,8 +28,8 @@ public class UserController {
     }
 
     @PostMapping("login")
-    public ResponseEntity<UserLoginResponseDto> login(@Validated(UserLogin.class) @RequestBody UserDto userDto) {
-        return ResponseEntity.ok(userService.login(userDto));
+    public ResponseEntity<UserLoginResponseDto> login(@Validated @RequestBody LoginRequestDto loginRequestDto) {
+        return ResponseEntity.ok(userService.login(loginRequestDto));
     }
 
 

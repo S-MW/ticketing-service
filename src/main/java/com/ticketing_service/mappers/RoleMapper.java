@@ -7,6 +7,12 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface RoleMapper extends BaseMapper<RoleDto, Role> {
 
+
+    @Override
+    RoleDto toDto(Role entity);
+
+    @Override
+    Role toEntity(RoleDto dto);
 }
 
 
